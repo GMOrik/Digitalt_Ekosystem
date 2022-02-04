@@ -19,13 +19,11 @@ public class Konsument extends Liv{
     
     //variabler för överlevnad/rörelsebegränsningar
     private int energi;
-    private int hunger = 3; //implementerad i interact()
-    private int standardhunger; //hur mätt individen blir. implementeras i interact()
-    //dock ej ordentligt implementerat för växtätare
+    private int hunger = 3; 
+    private int standardhunger; 
     
-    //ev. ta graviditetstid från konsument
     private int graviditetstid = 0;
-    private int standardgraviditetstid; //hur länge individen är gravid när den blir det
+    private int standardgraviditetstid; 
     private int reproduktionschans; //i promille, tal mellan 0 och 1000 för att undvika behov av doublevariabler
     
     private int ålder = 0;
@@ -49,12 +47,12 @@ public class Konsument extends Liv{
      * @param storlek
      * @param snabbhet
      * @param energi
-     * @param platsINäringskedjan //följande kan bli double: storlek, snabbhet, avsökningsavstånd, reproduktionschans, tillväxthastighet (planta)
-     * @param avsökningsavstånd //isf även posX och posY (men grafiken blir då ej exakt, dessutom halvjobbigt i Mall)
+     * @param platsINäringskedjan 
+     * @param avsökningsavstånd 
      * @param standardgraviditetstid 
-     * @param reproduktionschans //andra utvecklingsmöjligheter: ruta som objekt, kan vara vatten, berg etc (dock oförenligt med deltal ovan)
-     * @param standardhunger //andra typer av förhållanden (parasiter etc.), årstider och dag, väder
-     * @param könsmogen //motivering av bara heltal utifrån praktikaliteter/mark (växternas position etc.)
+     * @param reproduktionschans 
+     * @param standardhunger
+     * @param könsmogen 
      * @param maximiålder 
      */
     public Konsument(int storlek, int snabbhet, int energi, int platsINäringskedjan, int avsökningsavstånd, int standardgraviditetstid,
@@ -74,9 +72,6 @@ public class Konsument extends Liv{
         spawn();
     }
     
-    /**
-     * Ger individen en slumpmässig tom plats i arenan
-     */
     @Override
     protected void spawn(){
         this.posX = (int)(Ekosystem.sidaX()*Math.random());
@@ -95,7 +90,7 @@ public class Konsument extends Liv{
         
         while(energi>0){
             double vinkelIRad = 2*Math.PI*riktning/360;
-            int hoppX = Math.abs((int)Math.round((snabbhet*Math.cos(vinkelIRad)))); //+0.5 för avrundning? gör dock att alla hamnar ner höger
+            int hoppX = Math.abs((int)Math.round((snabbhet*Math.cos(vinkelIRad)))); 
             int hoppY = Math.abs((int)Math.round((snabbhet*Math.sin(vinkelIRad))));
             
             if (riktning <90){
@@ -146,13 +141,12 @@ public class Konsument extends Liv{
                 if (1000*Math.random() < reproduktionschans) { 
                     Konsument avkomma = new Konsument(storlek, snabbhet, energi, platsINäringskedjan, avsökningsavstånd, 
                     standardgraviditetstid, reproduktionschans, standardhunger, könsmogen, maximiålder);
-                    //går att göra genetiskt, men då måste man spara info om partnern för varje graviditet
                     avkomma.posX = posX;
                     avkomma.posY = posY; 
                     //ev. något om generationstal
                     avkomma.geSammaIDSom(this);
                     List<Konsument> l = (List<Konsument>) this.hämtaLista().lista;
-                    avkomma.hunger = (int)(standardhunger); //för att undvika att de ät på ett ställe och bara kör sin grej. könsmogen kan dock stoppa lite
+                    avkomma.hunger = (int)(standardhunger); 
                     avkomma.ålder = 0;
                     l.add(avkomma);
                 }
@@ -196,14 +190,12 @@ public class Konsument extends Liv{
                             }
                             break;
                         }
-                        //chans att överleva? växtätare starka nog att slå tillbaka?
                         a.dö("Predation");
                         this.hunger += standardhunger;
                         break OUTER;
                     case -1:
                         //this.dö("Predation");
                         //satsen ovan avgör om gröna kan dö av att hoppa in i röda eller ej
-                        //utfördInteraktion = true;
                         break;
                     case 0:
                         Konsument i = (Konsument)a;
@@ -230,7 +222,7 @@ public class Konsument extends Liv{
     
     private synchronized void ändraVinkel(){
         
-        //1. Slumpmässigt riktningsbyte för att de inte ska vara ping-pong-bollar
+        //1. Slumpmässigt riktningsbyte 
         riktning = (360*Math.random());
         
         //2. Trycker bort individen från väggarna
@@ -247,7 +239,7 @@ public class Konsument extends Liv{
         riktning = (0 + 180*Math.random());
         }
         
-        //vinklarna verkar gå moturs av någon anledning
+        //vinklarna går moturs
         
         ArrayList<Liv> närområde = närområde();
         ArrayList<Konsument> matlista = new ArrayList<>();
@@ -270,12 +262,10 @@ public class Konsument extends Liv{
         //2.5: parning, skrivs över om hot/mat är i närheten (gällande mat krävs också att man är hungrig
         if (!parningslista.isEmpty() && graviditetstid <= 0 && hunger > (int)(standardhunger*0.3 + 0.5) && könsmogen()){ //para sig om mer än 30% hungrig
             hoppaMotNärmstaIndivid(parningslista, true);
-            //kanske måste bli närmsta fertil individ (någon som redan är gravid är inget att ha)
         }
         
         //3. En individ med lägre plats i näringskedjan syns (finns i synfält)
         if (!matlista.isEmpty() && hunger <= (int)(standardhunger*0.3 + 0.5)) { //sista villkoret för att ingen ska få typ hunger = 50
-            //System.out.println("här");
             hoppaMotNärmstaIndivid(matlista, false);
         }
         
@@ -292,18 +282,16 @@ public class Konsument extends Liv{
         }
                 
         if (riktning >= 360) riktning -= 360;
-        //System.out.println("id: " + id + " posX: " + posX + " posY: " + posY + " Riktning: " + riktning + " Plats i N: " + platsINäringskedjan);
     }
     
-    //ev. grow och reproduce
     
     private ArrayList<Liv> närområde(){
         ArrayList<Liv> lista = new ArrayList<>();
         
         //väldigt lik det som står i interact()
         for (Livlista storlista: Ekosystem.listaÖverListor) {
-            for (Liv a : (ArrayList<Konsument>)storlista.lista) { //individlistan kan användas om man bara kör inre satsen
-                if (a.ärDöd()) { //metoden equals fungerar inte riktigt för att kolla om man inte hittar sig själv - om hunger, gravid och ålder är lika är två objekt lika
+            for (Liv a : (ArrayList<Konsument>)storlista.lista) { 
+                if (a.ärDöd()) { 
                     continue;
                 }
                 double avstånd = Math.sqrt(Math.pow(a.posX - posX, 2) + Math.pow(a.posY - posY, 2));
@@ -326,9 +314,7 @@ public class Konsument extends Liv{
             
             if (parning){
                 Konsument i = (Konsument)a;
-                //förhindrar homosexualitet
                 if (hane == i.hane || !i.könsmogen()) continue;
-                //förhindrar att man försöker göra någon gravid gravid
                 if (hane && i.graviditetstid != -1) continue;
             }
             Vektor2D v = new Vektor2D(posX, posY, a.posX, a.posY);
@@ -340,8 +326,6 @@ public class Konsument extends Liv{
         if (minst != Vektor2D.MAXVEKTORN) {
             riktning = minst.vinkel();
             if (minst.längd() < this.snabbhet) this.snabbhet = (int) (minst.längd() + 0.5);
-            //System.out.println("Ändravinkel() id: " + id + " Vinkel: " + riktning + " Längd: " + minst.längd());
-            //moturs vinklar?
         }
     }
     
